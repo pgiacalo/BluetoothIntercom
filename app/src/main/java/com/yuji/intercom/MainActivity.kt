@@ -2,11 +2,10 @@ package com.yuji.intercom
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
-//import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.pm.PackageManager
 import android.os.Bundle
-//Jetpack Compose
+import androidx.compose.ui.graphics.Color
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
@@ -17,9 +16,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-//import org.w3c.dom.Text
 import android.content.Context
 import android.bluetooth.BluetoothManager
+import androidx.compose.material.ButtonDefaults
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,7 +26,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bluetoothManager: BluetoothManager
     private lateinit var bluetoothAdapter: BluetoothAdapter
 
-    //    private val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
     private val REQUEST_ENABLE_BT = 1
     private val bluetoothDevices = mutableStateListOf<BluetoothDevice>()
     private val selectedDevices = mutableStateListOf<BluetoothDevice>()
@@ -47,15 +45,20 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+        bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        bluetoothAdapter = bluetoothManager.adapter
+
         setContent {
             Column {
                 Button(onClick = {
-                    val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
+                    val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter.bondedDevices
                     pairedDevices?.forEach { device ->
-                        bluetoothDevices.add(device)
+                        if (device !in bluetoothDevices) {
+                            bluetoothDevices.add(device)
+                        }
                     }
-                }) {
-                    Text("Refresh Devices")
+                }, colors = ButtonDefaults.buttonColors(backgroundColor = Color.Blue)) {
+                    Text("Refresh Bluetooth Devices", color = Color.White)
                 }
 
                 LazyColumn {
@@ -79,9 +82,5 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
-        bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        bluetoothAdapter = bluetoothManager.getAdapter()
-
     }
 }
